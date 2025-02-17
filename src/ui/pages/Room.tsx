@@ -212,7 +212,7 @@ function Room() {
 
           <motion.button
             type="submit"
-            className="w-full py-3 px-6 bg-slate-50 text-zinc-900 font-semibold rounded-lg hover:bg-slate-200 transition-all focus:outline-none focus:ring-2 focus:ring-slate-500"
+            className="w-full py-3 px-6 text-slate-50 font-semibold rounded-lg  transition-all focus:outline-none focus:ring-2 focus:ring-slate-500 bg-emerald-500/90 hover:bg-emerald-600 border border-emerald-500/30 hover:border-emerald-500/50"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >

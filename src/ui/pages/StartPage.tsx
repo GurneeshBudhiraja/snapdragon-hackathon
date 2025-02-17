@@ -96,7 +96,7 @@ function StartPage() {
       <div className="flex flex-col sm:flex-row gap-4 mt-4 w-full max-w-md z-10">
         <Link
           to={"/create-room/create"}
-          className="w-full py-3 px-6 border border-slate-50/30 hover:border-slate-50/50 bg-transparent hover:bg-slate-50/10 font-semibold rounded-lg transition-all text-base text-slate-50 text-center"
+          className="w-full py-3 px-6 bg-emerald-500/90 hover:bg-emerald-600 border border-emerald-500/30 hover:border-emerald-500/50 font-semibold rounded-lg transition-all text-base text-slate-50 text-center"
         >
           <Button>Create New Room</Button>
         </Link>
