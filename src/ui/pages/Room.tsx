@@ -1,7 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router";
 import { motion } from "framer-motion";
 import { Home } from "lucide-react";
+import GetRoomInfo from "../components/getInfo/GetRoomInfo";
+import GetUserInfo from "../components/getInfo/GetUserinfo";
 
 function Room() {
   const location = useLocation();
@@ -11,29 +13,20 @@ function Room() {
   // Room password
   const passwordInput = React.useRef(null);
 
-  // Generate a room id
-  const generateRoomId = () => {
-    const vowels = "aeiou";
-    const consonants = "bcdfghjklmnpqrstvwxyz";
-    const hyphen = "-";
+  // Get user name
+  const [userNameState, setUserNameState] = React.useState<{
+    acceptName: boolean;
+    userName: React.RefObject<HTMLInputElement | null>;
+  }>({ acceptName: false, userName: React.useRef(null) });
 
-    // Generate a segment
-    const generateSegment = () => {
-      return (
-        consonants[Math.floor(Math.random() * consonants.length)] +
-        vowels[Math.floor(Math.random() * vowels.length)] +
-        (Math.random() > 0.5 ? hyphen : "")
-      );
-    };
-
-    // Combine segments to create a readable ID
-    let roomId = "";
-    while (roomId.length < 8) {
-      roomId += generateSegment();
-    }
-
-    return roomId;
-  };
+  // Contains the room info entered by the user
+  const [roomInfo, setRoomInfo] = useState<{
+    roomId: string;
+    roomPassword: string;
+  }>({
+    roomId: "",
+    roomPassword: "",
+  });
 
   // Update path based on URL
   useEffect(() => {
@@ -46,23 +39,27 @@ function Room() {
     console.log(currentPath);
   }, [location.pathname]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Submits the form
+  const handleSubmit = (e: React.FormEvent, params: "getName" | "submit") => {
     e.preventDefault();
-    if (!roomIdInput.current || !passwordInput.current) return;
-    if (path === "create") {
-      // Room create logic
-      console.log(
-        "Creating room:",
-        (roomIdInput.current as HTMLInputElement).value,
-        (passwordInput.current as HTMLInputElement).value
-      );
-    } else if (path === "join") {
-      // Room join logic
-      console.log(
-        "Join room:",
-        (roomIdInput.current as HTMLInputElement).value,
-        (passwordInput.current as HTMLInputElement).value
-      );
+    if (params === "getName" && roomIdInput.current && passwordInput.current) {
+      setRoomInfo({
+        roomId: (roomIdInput.current as HTMLInputElement).value,
+        roomPassword: (passwordInput.current as HTMLInputElement).value,
+      });
+      console.log({
+        roomId: (roomIdInput.current as HTMLInputElement).value,
+        roomPassword: (passwordInput.current as HTMLInputElement).value,
+      });
+      setUserNameState({
+        ...userNameState,
+        acceptName: true,
+      });
+    } else if (params === "submit" && userNameState.userName.current) {
+      console.log({
+        ...roomInfo,
+        name: (userNameState.userName.current as HTMLInputElement).value,
+      });
     }
   };
 
@@ -161,74 +158,29 @@ function Room() {
         className="bg-zinc-800 rounded-lg border border-white/10 p-8 max-w-md w-full shadow-lg relative"
       >
         <h2 className="text-2xl font-bold text-slate-50 mb-6">
-          {path === "create" ? "Create New Room" : "Join Existing Room"}
+          {!userNameState.acceptName
+            ? path === "create"
+              ? "Create New Room"
+              : "Join Existing Room"
+            : "Add Name"}
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <div className="flex justify-between items-center mb-2">
-              <label
-                htmlFor="roomId"
-                className="text-sm font-medium text-slate-300"
-              >
-                Room ID {path === "create" && "(Custom or Generated)"}
-              </label>
-              {path === "create" && (
-                <motion.button
-                  type="button"
-                  onClick={() => {
-                    if (roomIdInput.current) {
-                      (roomIdInput.current as HTMLInputElement).value =
-                        generateRoomId();
-                    }
-                  }}
-                  className="text-sm text-slate-400 hover:text-slate-300 transition-colors"
-                >
-                  Generate ID
-                </motion.button>
-              )}
-            </div>
-            <input
-              type="text"
-              id="roomId"
-              ref={roomIdInput}
-              className="w-full px-4 py-2 bg-zinc-700 text-slate-50 rounded-lg border border-white/10 focus:outline-none focus:ring-2 focus:ring-slate-500"
-              placeholder={
-                path === "create"
-                  ? "e.g. XA3B8C or leave empty to generate"
-                  : "Enter existing Room ID"
-              }
-              required
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-slate-300 mb-2"
-            >
-              Security Key
-            </label>
-            <input
-              type="password"
-              id="password"
-              ref={passwordInput}
-              className="w-full px-4 py-2 bg-zinc-700 text-slate-50 rounded-lg border border-white/10 focus:outline-none focus:ring-2 focus:ring-slate-500"
-              placeholder="Enter security key"
-              minLength={6}
-              required
-            />
-          </div>
-
-          <motion.button
-            type="submit"
-            className="w-full py-3 px-6 text-slate-50 font-semibold rounded-lg  transition-all focus:outline-none focus:ring-2 focus:ring-slate-500 bg-emerald-500/90 hover:bg-emerald-600 border border-emerald-500/30 hover:border-emerald-500/50"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            {`${path.slice(0, 1).toUpperCase() + path.substring(1)} Room`}
-          </motion.button>
-        </form>
+        {!userNameState.acceptName ? (
+          <GetRoomInfo
+            handleSubmit={handleSubmit}
+            passwordInput={passwordInput}
+            roomIdInput={roomIdInput}
+            key={"room"}
+            path={path}
+          />
+        ) : (
+          <GetUserInfo
+            handleSubmit={handleSubmit}
+            path={path}
+            key={"user-info"}
+            userNameRef={userNameState.userName}
+          />
+        )}
       </motion.div>
     </div>
   );
