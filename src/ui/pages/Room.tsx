@@ -7,9 +7,9 @@ function Room() {
   const location = useLocation();
   const [path, setPath] = React.useState<"create" | "join" | "">("");
   // Room id
-  const [roomId, setRoomId] = React.useState("");
+  const roomIdInput = React.useRef(null);
   // Room password
-  const [password, setPassword] = React.useState("");
+  const passwordInput = React.useRef(null);
 
   // Generate a room id
   const generateRoomId = () => {
@@ -48,17 +48,26 @@ function Room() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!roomIdInput.current || !passwordInput.current) return;
     if (path === "create") {
       // Room create logic
-      console.log("Creating room:", roomId, password);
+      console.log(
+        "Creating room:",
+        (roomIdInput.current as HTMLInputElement).value,
+        (passwordInput.current as HTMLInputElement).value
+      );
     } else if (path === "join") {
       // Room join logic
-      console.log("Joining room:", roomId, password);
+      console.log(
+        "Join room:",
+        (roomIdInput.current as HTMLInputElement).value,
+        (passwordInput.current as HTMLInputElement).value
+      );
     }
   };
 
   return (
-    <div className="h-full bg-zinc-900 flex items-center justify-center rounded-lg border border-white/10 p-8 overflow-auto relative shadow-[0px_-1px_20px_2px_#ffffff1c]">
+    <div className="h-full bg-zinc-900 flex items-center justify-center rounded-lg border border-white/10 p-8 overflow-clip relative shadow-[0px_-1px_20px_2px_#ffffff1c]">
       {/* Background Animation */}
       <motion.div
         className="absolute inset-0 pointer-events-none"
@@ -167,10 +176,13 @@ function Room() {
               {path === "create" && (
                 <motion.button
                   type="button"
-                  onClick={() => setRoomId(generateRoomId())}
+                  onClick={() => {
+                    if (roomIdInput.current) {
+                      (roomIdInput.current as HTMLInputElement).value =
+                        generateRoomId();
+                    }
+                  }}
                   className="text-sm text-slate-400 hover:text-slate-300 transition-colors"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
                 >
                   Generate ID
                 </motion.button>
@@ -179,8 +191,7 @@ function Room() {
             <input
               type="text"
               id="roomId"
-              value={roomId}
-              onChange={(e) => setRoomId(e.target.value)}
+              ref={roomIdInput}
               className="w-full px-4 py-2 bg-zinc-700 text-slate-50 rounded-lg border border-white/10 focus:outline-none focus:ring-2 focus:ring-slate-500"
               placeholder={
                 path === "create"
@@ -201,8 +212,7 @@ function Room() {
             <input
               type="password"
               id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              ref={passwordInput}
               className="w-full px-4 py-2 bg-zinc-700 text-slate-50 rounded-lg border border-white/10 focus:outline-none focus:ring-2 focus:ring-slate-500"
               placeholder="Enter security key"
               minLength={6}
@@ -216,7 +226,7 @@ function Room() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            {path === "create" ? "Create Secure Room" : "Join Room"}
+            {`${path.slice(0, 1).toUpperCase() + path.substring(1)} Room`}
           </motion.button>
         </form>
       </motion.div>

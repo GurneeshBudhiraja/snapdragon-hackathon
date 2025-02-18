@@ -5,7 +5,10 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 function App() {
   return (
     <BrowserRouter>
-      <div className="w-full h-svh p-2">
+      <div
+        className="w-full h-svh p-2 
+      "
+      >
         <Routes>
           <Route path="/" element={<StartPage />} />
           <Route path="/create-room/*" element={<Room />} />
